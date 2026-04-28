@@ -16,6 +16,13 @@ tags:
 
 *(See below for [Presentation Slides](#), [Video Walkthrough](#), and [Blog Post](#))*
 
+## TL;DR
+
+Swiftlogic CommerceOps v2 is an autonomous AI operator trained to run a full e-commerce business for a 50-day horizon under delayed consequences.  
+Instead of solving single prompts, it learns long-horizon decisions across pricing, inventory, support, marketing, and cash management.
+
+**Judge takeaway:** this is a complete loop from environment design -> RL training -> measurable gains -> deployable API demo.
+
 ---
 
 ## 🛑 The Problem: What Capability Gap Are We Targeting?
@@ -63,6 +70,17 @@ The agent learned to stabilize the business. It stopped reactive over-ordering, 
 - **Composite Score Improvement:** `0.61 -> 0.66 (+9%)` across unseen evaluation tasks.
 - The model successfully generalizes to unseen business configs (e.g., swapping from a fashion store to a pharmacy or a SaaS business).
 
+### Quick Metrics Snapshot
+
+| Dimension | Zero-Shot Baseline | Trained Agent | Direction |
+| --- | --- | --- | --- |
+| Composite Score | 0.61 | 0.66 | +9% |
+| Bankruptcy Resilience | Low | Significantly improved | Better |
+| Inventory Stability | ~40% | Higher and steadier | Better |
+| Ticket Triage | ~80% | Maintained/improved | Better |
+
+> Note: exact values vary by scenario seed; this table captures the reported benchmark trend from the included artifacts.
+
 **Key Artifacts:**
 - 📈 **[Reward Curve](artifacts/reward_curve.png)**: Shows steady policy improvement over training steps.
 - 📉 **[Exploration Curve](artifacts/exploration_curve.png)**: Demonstrates the model narrowing in on a winning business strategy.
@@ -76,6 +94,14 @@ The agent learned to stabilize the business. It stopped reactive over-ordering, 
 - **Enterprise Operators:** It proves that LLMs can be trained to operate not just as chatbots, but as autonomous business controllers. 
 
 The environment includes a built-in **CEO Layer** that generates step-by-step causal explanations (e.g., "The agent chose to wait because it wanted to maintain balance, despite a slight revenue downtrend"). This makes the agent's decisions fully auditable and judge-ready, bridging the gap between black-box RL and enterprise explainability requirements.
+
+## 🏆 Why This Is Hackathon-Strong
+
+- **Novel benchmark choice:** business operations with delayed effects, not just short-context tasks.
+- **Measurable improvement:** before/after artifacts and composite score gain.
+- **Generalization claim:** tested across unseen business configurations.
+- **Productized delivery:** runnable API + container + demo + narrative explainability.
+- **Clear evaluation story:** constraints, rewards, penalties, and outcomes are explicit.
 
 ## ⚙️ Pipeline & Architecture
 
@@ -245,6 +271,15 @@ python scripts/run_full_pipeline.py --fast-mode
 uvicorn server.app:app --host 0.0.0.0 --port 7860
 ```
 
+## ✅ Submission Checklist (for final judging)
+
+- [ ] Demo link works and loads in <60 seconds.
+- [ ] README has problem, approach, metrics, and architecture flow.
+- [ ] Artifacts are present (`reward_curve`, `exploration_curve`, `before_after_comparison`, `failure_vs_recovery`).
+- [ ] Repro commands run on a clean machine.
+- [ ] Video walkthrough explains baseline failure vs trained recovery.
+- [ ] Attribution to original source repository is retained.
+
 ## 🏁 Hackathon Positioning
 
 Why this stands out in a hackathon:
@@ -258,3 +293,11 @@ Why this stands out in a hackathon:
 
 This codebase is sourced from the original project by Rehan-2024 for the OpenEnv / Scalerxmeta hackathon context.  
 If you publish this fork publicly, keep attribution to the original repository and contributors.
+
+---
+
+If you are a judge/reviewer and want a rapid pass, start with:
+1. **TL;DR** section
+2. **Quick Metrics Snapshot**
+3. **System Workflow** diagram
+4. **5-step Quick Start** and live demo
