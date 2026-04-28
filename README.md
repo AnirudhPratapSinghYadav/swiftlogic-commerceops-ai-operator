@@ -145,3 +145,116 @@ COMMERCEOPS_DEMO_MODE=1 API_BASE_URL=<openai-compatible-endpoint> MODEL_NAME=<id
 - 🎥 *[Video Walkthrough]* (https://youtu.be/DQRRnoEToWg?si=G1TVjQFnrUjfXHHw)
 
 
+## 🧠 End-to-End Agent Flow
+
+This project is structured as a full-stack autonomous operations system:
+
+- **Environment layer** (`ecom_env.py`): simulator of market dynamics, demand, inventory, and ticket load.
+- **Policy layer** (`training/`, notebook): learns long-horizon strategy via GRPO.
+- **Inference layer** (`inference.py`, `server/`): runs decisions in real-time and exposes OpenEnv-compatible APIs.
+- **Narrative layer** (CEO mode): explains decision rationale for auditability and demos.
+
+```mermaid
+flowchart LR
+    O[Observation State] --> P[Policy Inference]
+    P --> A[Action Selection]
+    A --> E[Environment Transition]
+    E --> R[Reward Computation]
+    R --> M[Metrics + Logs]
+    M --> O
+```
+
+## 🔍 Runtime Decision Cycle
+
+Each simulated day follows a deterministic sequence:
+
+1. Pull current balance, inventory, ticket queue, supplier quotes, and competitor pricing.
+2. Generate candidate actions from current constraints.
+3. Choose the highest-value action under policy + safety checks.
+4. Apply environment transitions (demand, fulfillment, lead times, shocks).
+5. Compute dense reward and update score trajectory.
+6. Emit explainability narrative in CEO mode.
+
+```mermaid
+sequenceDiagram
+    participant Env as CommerceOps Env
+    participant Agent as Trained Policy
+    participant Judge as Reward Engine
+    participant CEO as Explainability Layer
+
+    Env->>Agent: state_t
+    Agent->>Env: action_t
+    Env->>Judge: transition(state_t, action_t)
+    Judge-->>Env: reward_t + penalties
+    Env->>CEO: state_t, action_t, reward_t
+    CEO-->>Env: human-readable rationale
+    Env-->>Agent: state_t+1
+```
+
+## 🏗️ Training and Evaluation Pipeline
+
+The training pipeline is built for reproducibility:
+
+- **Data generation** through simulated episodes.
+- **GRPO optimization** with policy updates on grouped trajectories.
+- **Checkpointing** adapter weights and intermediate metrics.
+- **Evaluation sweep** across unseen business scenarios.
+- **Artifact export** for benchmark reporting and demo readiness.
+
+```mermaid
+flowchart TD
+    S1[Seed Configs] --> S2[Episode Rollouts]
+    S2 --> S3[Trajectory Grouping]
+    S3 --> S4[GRPO Update Step]
+    S4 --> S5[Checkpoint Adapter]
+    S5 --> S6[Unseen Scenario Eval]
+    S6 --> S7[Export Artifacts]
+```
+
+## ☁️ Deployment Architecture
+
+```mermaid
+flowchart TB
+    Client[Reviewer / Product Team] --> API[FastAPI Server]
+    API --> Env[CommerceOps Environment]
+    API --> Policy[Model Inference Layer]
+    Policy --> CEO[Explainability Output]
+    Env --> Metrics[Artifacts + Curves]
+    CEO --> Client
+    Metrics --> Client
+```
+
+## 📁 Repository Map
+
+- `server/` - FastAPI app and OpenEnv API endpoints.
+- `scripts/` - reproducible pipeline scripts and automation helpers.
+- `training/` - training logic and policy optimization assets.
+- `tests/` - unit and integration tests for env and pipeline.
+- `configs/` - scenario/business profile configurations.
+- `artifacts/` - exported plots and benchmark outputs.
+- `demo/` - demo interfaces and walkthrough helpers.
+
+## 🧪 Verification Checklist
+
+Run this checklist before final submission:
+
+```bash
+pip install -r requirements.txt
+pytest -q
+python scripts/run_full_pipeline.py --fast-mode
+uvicorn server.app:app --host 0.0.0.0 --port 7860
+```
+
+## 🏁 Hackathon Positioning
+
+Why this stands out in a hackathon:
+
+- Tackles **long-horizon autonomy** instead of single-call prompting.
+- Demonstrates **measurable RL improvement** over baseline behavior.
+- Includes **auditable explainability** for enterprise trust.
+- Ships as a **deployable system**, not just a notebook experiment.
+
+## 📜 License & Credits
+
+This codebase is sourced from the original project by Rehan-2024 for the OpenEnv / Scalerxmeta hackathon context.  
+If you publish this fork publicly, keep attribution to the original repository and contributors.
